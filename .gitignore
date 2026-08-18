@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual Environment
+.venv/
+venv/
+env/
+
+# Environment variables
+.env
+.env.*
+
+# Jupyter
+.ipynb_checkpoints/
+
+# VS Code
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# TensorFlow / Keras generated files
+*.keras.tmp
+
+# Large training dataset
+fer2013.csv
+
+# Training dataset folder
+fer2013_data/
+# Large training dataset
+fer2013.csv
+fer2013_data/
+
+# Unused trained models
+models/best_model_finetuned.keras
+models/best_model_phase1.keras

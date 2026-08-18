@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Emotion AI</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <header>
+            <div class="logo">
+                <span>◉</span> Emotion AI
+            </div>
+
+            <div class="status">
+                <span class="dot"></span>
+                API Ready
+            </div>
+        </header>
+
+
+        <main>
+
+            <section class="hero">
+                <p class="tag">AI POWERED</p>
+
+                <h1>
+                    Face Emotion<br>
+                    <span>Recognition</span>
+                </h1>
+
+                <p class="description">
+                    Upload a facial image and let our AI model
+                    analyze the emotion.
+                </p>
+            </section>
+
+
+            <section class="card">
+
+                <div class="upload-area" id="uploadArea">
+
+                    <div class="upload-icon">
+                        📷
+                    </div>
+
+                    <h2>Upload an Image</h2>
+
+                    <p>
+                        Choose a clear face image to analyze
+                    </p>
+
+                    <input
+                        type="file"
+                        id="imageInput"
+                        accept="image/*"
+                        hidden
+                    >
+
+                    <button id="chooseBtn">
+                        Choose Image
+                    </button>
+
+                </div>
+
+
+                <div class="preview-container" id="previewContainer">
+
+                    <img id="previewImage" alt="Preview">
+
+                    <button class="remove-btn" id="removeBtn">
+                        ×
+                    </button>
+
+                </div>
+
+
+                <button class="analyze-btn" id="analyzeBtn">
+                    Analyze Emotion
+                </button>
+
+            </section>
+
+
+            <section class="result-card" id="resultCard">
+
+                <div class="result-header">
+                    <span>Analysis Result</span>
+                    <span class="ai-badge">AI</span>
+                </div>
+
+                <div class="emotion">
+
+                    <div class="emotion-icon" id="emotionIcon">
+                        😊
+                    </div>
+
+                    <div>
+                        <p class="small-text">Detected Emotion</p>
+
+                        <h2 id="emotionText">
+                            Happy
+                        </h2>
+                    </div>
+
+                </div>
+
+
+                <div class="confidence">
+
+                    <div class="confidence-top">
+                        <span>Confidence</span>
+                        <strong id="confidenceText">
+                            94%
+                        </strong>
+                    </div>
+
+                    <div class="progress">
+                        <div
+                            class="progress-bar"
+                            id="progressBar">
+                        </div>
+                    </div>
+
+                </div>
+
+            </section>
+
+        </main>
+
+
+        <footer>
+            Face Emotion Recognition • FastAPI + Deep Learning
+        </footer>
+
+    </div>
+
+
+    <script src="script.js"></script>
+
+</body>
+</html>

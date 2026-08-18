@@ -1,0 +1,326 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #07131d;
+    color: #ffffff;
+    min-height: 100vh;
+}
+
+.container {
+    width: 100%;
+    max-width: 1000px;
+    margin: auto;
+    padding: 25px;
+}
+
+
+/* HEADER */
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid #19303d;
+}
+
+.logo {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.logo span {
+    color: #45d6ff;
+    margin-right: 8px;
+}
+
+.status {
+    font-size: 13px;
+    color: #a9bbc5;
+}
+
+.dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: #45e09a;
+    border-radius: 50%;
+    margin-right: 6px;
+}
+
+
+/* HERO */
+
+.hero {
+    text-align: center;
+    padding: 70px 20px 40px;
+}
+
+.tag {
+    color: #45d6ff;
+    font-size: 12px;
+    letter-spacing: 3px;
+    margin-bottom: 15px;
+}
+
+.hero h1 {
+    font-size: 48px;
+    line-height: 1.1;
+    margin-bottom: 18px;
+}
+
+.hero h1 span {
+    color: #45d6ff;
+}
+
+.description {
+    color: #91a6b2;
+    font-size: 16px;
+}
+
+
+/* CARD */
+
+.card {
+    background: #0c1d29;
+    border: 1px solid #193746;
+    border-radius: 18px;
+    padding: 30px;
+    max-width: 600px;
+    margin: auto;
+}
+
+
+/* UPLOAD */
+
+.upload-area {
+    border: 1px dashed #315464;
+    border-radius: 14px;
+    padding: 50px 20px;
+    text-align: center;
+}
+
+.upload-icon {
+    font-size: 40px;
+    margin-bottom: 15px;
+}
+
+.upload-area h2 {
+    margin-bottom: 8px;
+}
+
+.upload-area p {
+    color: #7f96a3;
+    margin-bottom: 25px;
+}
+
+.upload-area button {
+    background: #45d6ff;
+    color: #031018;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.upload-area button:hover {
+    opacity: 0.85;
+}
+
+
+/* PREVIEW */
+
+.preview-container {
+    display: none;
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.preview-container img {
+    width: 100%;
+    max-height: 400px;
+    object-fit: contain;
+    border-radius: 12px;
+    background: #061018;
+}
+
+.remove-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+
+    width: 32px;
+    height: 32px;
+
+    border: none;
+    border-radius: 50%;
+
+    background: #111;
+    color: white;
+
+    font-size: 20px;
+    cursor: pointer;
+}
+
+
+/* ANALYZE */
+
+.analyze-btn {
+    width: 100%;
+    margin-top: 20px;
+
+    padding: 14px;
+
+    border: none;
+    border-radius: 9px;
+
+    background: #ffffff;
+    color: #07131d;
+
+    font-size: 15px;
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+.analyze-btn:hover {
+    background: #45d6ff;
+}
+
+
+/* RESULT */
+
+.result-card {
+    display: none;
+
+    max-width: 600px;
+    margin: 25px auto;
+
+    background: #0c1d29;
+    border: 1px solid #193746;
+
+    border-radius: 18px;
+    padding: 25px;
+}
+
+.result-header {
+    display: flex;
+    justify-content: space-between;
+    color: #a9bbc5;
+    margin-bottom: 25px;
+}
+
+.ai-badge {
+    background: #143a48;
+    color: #45d6ff;
+
+    padding: 5px 10px;
+    border-radius: 6px;
+
+    font-size: 11px;
+}
+
+
+/* EMOTION */
+
+.emotion {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.emotion-icon {
+    width: 65px;
+    height: 65px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #102b38;
+    border-radius: 14px;
+
+    font-size: 32px;
+}
+
+.small-text {
+    color: #718895;
+    font-size: 13px;
+    margin-bottom: 5px;
+}
+
+#emotionText {
+    font-size: 25px;
+}
+
+
+/* CONFIDENCE */
+
+.confidence {
+    margin-top: 30px;
+}
+
+.confidence-top {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+
+    color: #91a6b2;
+}
+
+.confidence-top strong {
+    color: #45d6ff;
+}
+
+.progress {
+    height: 8px;
+    background: #172c37;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    width: 0%;
+    height: 100%;
+    background: #45d6ff;
+    transition: width 0.8s ease;
+}
+
+
+/* FOOTER */
+
+footer {
+    text-align: center;
+    color: #536b78;
+    font-size: 12px;
+    padding: 40px 0 20px;
+}
+
+
+/* MOBILE */
+
+@media (max-width: 600px) {
+
+    .container {
+        padding: 15px;
+    }
+
+    .hero {
+        padding-top: 45px;
+    }
+
+    .hero h1 {
+        font-size: 36px;
+    }
+
+    .card {
+        padding: 18px;
+    }
+
+}

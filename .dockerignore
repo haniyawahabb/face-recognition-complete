@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.git
+.gitignore
+.venv
+venv/
+fer2013_data/
+fer2013.csv
+*.ipynb
+.ipynb_checkpoints/
