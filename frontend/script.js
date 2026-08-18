@@ -28,41 +28,114 @@ const confidenceText =
 const progressBar =
     document.getElementById("progressBar");
 
+const uploadArea =
+    document.getElementById("uploadArea");
 
-/* CHOOSE IMAGE */
+
+// ========================================
+// FASTAPI BACKEND URL
+// ========================================
+
+const API_URL =
+    "https://face-recognition-complete.fastapicloud.dev/predict";
+
+
+// ========================================
+// EMOTION ICONS
+// ========================================
+
+const emotionIcons = {
+    angry: "😠",
+    disgust: "🤢",
+    fear: "😨",
+    happy: "😊",
+    neutral: "😐",
+    sad: "😢",
+    surprise: "😲"
+};
+
+
+// ========================================
+// CHOOSE IMAGE
+// ========================================
 
 chooseBtn.addEventListener("click", () => {
+
     imageInput.click();
+
 });
 
 
-/* IMAGE SELECTED */
+// ========================================
+// IMAGE SELECTED
+// ========================================
 
 imageInput.addEventListener("change", () => {
 
     const file = imageInput.files[0];
 
-    if (!file) return;
+    if (!file) {
+        return;
+    }
+
+
+    // Check image type
+
+    if (!file.type.startsWith("image/")) {
+
+        alert("Please select a valid image.");
+
+        imageInput.value = "";
+
+        return;
+    }
+
+
+    // Preview image
 
     const reader = new FileReader();
 
+
     reader.onload = function (event) {
 
-        previewImage.src = event.target.result;
+        previewImage.src =
+            event.target.result;
 
-        document.getElementById("uploadArea").style.display =
+
+        // Hide upload area
+
+        uploadArea.style.display =
             "none";
 
-        previewContainer.style.display = "block";
 
-        resultCard.style.display = "none";
+        // Show preview
+
+        previewContainer.style.display =
+            "block";
+
+
+        // Hide old result
+
+        resultCard.style.display =
+            "none";
+
+
+        // Reset progress
+
+        progressBar.style.width =
+            "0%";
+
     };
 
+
     reader.readAsDataURL(file);
+
 });
 
 
-/* REMOVE IMAGE */
+// ========================================
+// REMOVE IMAGE
+// ========================================
 
 removeBtn.addEventListener("click", () => {
 
@@ -70,84 +143,305 @@ removeBtn.addEventListener("click", () => {
 
     previewImage.src = "";
 
-    previewContainer.style.display = "none";
 
-    document.getElementById("uploadArea").style.display =
+    previewContainer.style.display =
+        "none";
+
+
+    uploadArea.style.display =
         "block";
 
-    resultCard.style.display = "none";
+
+    resultCard.style.display =
+        "none";
+
+
+    progressBar.style.width =
+        "0%";
+
+
+    emotionText.textContent =
+        "";
+
+    confidenceText.textContent =
+        "";
+
+    emotionIcon.textContent =
+        "";
+
 });
 
 
-/* ANALYZE */
+// ========================================
+// ANALYZE EMOTION
+// ========================================
 
 analyzeBtn.addEventListener("click", async () => {
 
-    if (!imageInput.files[0]) {
-        alert("Please choose an image first.");
+    const file = imageInput.files[0];
+
+
+    // No image selected
+
+    if (!file) {
+
+        alert(
+            "Please choose an image first."
+        );
+
         return;
     }
 
-    analyzeBtn.textContent = "Analyzing...";
+
+    // ========================================
+    // LOADING STATE
+    // ========================================
+
     analyzeBtn.disabled = true;
 
+    analyzeBtn.textContent =
+        "Analyzing...";
 
-    /*
-       Temporary demo result.
 
-       Baad mein isi jagah tumhare FastAPI
-       /predict endpoint ko connect karenge.
-    */
+    try {
 
-    setTimeout(() => {
 
-        const emotions = [
-            {
-                name: "Happy",
-                icon: "😊",
-                confidence: 94
-            },
-            {
-                name: "Sad",
-                icon: "😢",
-                confidence: 87
-            },
-            {
-                name: "Angry",
-                icon: "😠",
-                confidence: 91
-            },
-            {
-                name: "Neutral",
-                icon: "😐",
-                confidence: 89
+        // ========================================
+        // CREATE FORM DATA
+        // ========================================
+
+        const formData =
+            new FormData();
+
+
+        // IMPORTANT:
+        // FastAPI expects field name "file"
+
+        formData.append(
+            "file",
+            file
+        );
+
+
+        // ========================================
+        // SEND IMAGE TO FASTAPI
+        // ========================================
+
+        const response =
+            await fetch(
+                API_URL,
+                {
+                    method: "POST",
+                    body: formData
+                }
+            );
+
+
+        // ========================================
+        // CHECK RESPONSE
+        // ========================================
+
+        if (!response.ok) {
+
+            let errorMessage =
+                "Prediction failed.";
+
+            try {
+
+                const errorData =
+                    await response.json();
+
+                if (errorData.detail) {
+
+                    errorMessage =
+                        errorData.detail;
+
+                }
+
+            } catch (error) {
+
+                console.log(
+                    "Could not read error response."
+                );
+
             }
-        ];
-
-        const result =
-            emotions[Math.floor(Math.random() * emotions.length)];
 
 
-        emotionText.textContent = result.name;
+            throw new Error(
+                `${errorMessage} (${response.status})`
+            );
+        }
 
-        emotionIcon.textContent = result.icon;
+
+        // ========================================
+        // GET JSON RESPONSE
+        // ========================================
+
+        const data =
+            await response.json();
+
+
+        console.log(
+            "FastAPI Response:",
+            data
+        );
+
+
+        // ========================================
+        // GET PREDICTED EMOTION
+        // ========================================
+
+        const emotion =
+            data.predicted_emotion;
+
+
+        if (!emotion) {
+
+            throw new Error(
+                "No emotion was returned by the API."
+            );
+        }
+
+
+        // ========================================
+        // GET CONFIDENCE
+        // ========================================
+
+        let confidence =
+            Number(data.confidence);
+
+
+        if (Number.isNaN(confidence)) {
+
+            confidence = 0;
+
+        }
+
+
+        // Backend confidence is 0-1
+        // Convert to percentage
+
+        confidence =
+            confidence * 100;
+
+
+        // Keep between 0 and 100
+
+        confidence =
+            Math.max(
+                0,
+                Math.min(
+                    100,
+                    confidence
+                )
+            );
+
+
+        // ========================================
+        // EMOTION NAME
+        // ========================================
+
+        const emotionName =
+            emotion.charAt(0).toUpperCase() +
+            emotion.slice(1).toLowerCase();
+
+
+        // ========================================
+        // EMOTION ICON
+        // ========================================
+
+        const icon =
+            emotionIcons[
+                emotion.toLowerCase()
+            ] || "🙂";
+
+
+        // ========================================
+        // UPDATE UI
+        // ========================================
+
+        emotionText.textContent =
+            emotionName;
+
+
+        emotionIcon.textContent =
+            icon;
+
 
         confidenceText.textContent =
-            result.confidence + "%";
+            confidence.toFixed(2) + "%";
 
-        resultCard.style.display = "block";
+
+        // Show result card
+
+        resultCard.style.display =
+            "block";
+
+
+        // ========================================
+        // ANIMATE PROGRESS BAR
+        // ========================================
+
+        progressBar.style.width =
+            "0%";
 
 
         setTimeout(() => {
+
             progressBar.style.width =
-                result.confidence + "%";
+                confidence + "%";
+
         }, 100);
 
 
-        analyzeBtn.textContent = "Analyze Emotion";
+        // ========================================
+        // OPTIONAL:
+        // SHOW ALL PROBABILITIES
+        // ========================================
 
-        analyzeBtn.disabled = false;
+        console.log(
+            "Emotion probabilities:",
+            data.probabilities
+        );
 
-    }, 1000);
+
+    } catch (error) {
+
+
+        // ========================================
+        // ERROR HANDLING
+        // ========================================
+
+        console.error(
+            "Prediction Error:",
+            error
+        );
+
+
+        alert(
+            "Unable to analyze the image.\n\n" +
+            error.message
+        );
+
+
+        resultCard.style.display =
+            "none";
+
+
+    } finally {
+
+
+        // ========================================
+        // RESET BUTTON
+        // ========================================
+
+        analyzeBtn.disabled =
+            false;
+
+
+        analyzeBtn.textContent =
+            "Analyze Emotion";
+
+    }
 
 });
