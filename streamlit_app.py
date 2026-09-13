@@ -51,7 +51,7 @@ EMOTION_ICONS = {
 
 
 # ============================================================
-# CUSTOM STYLING
+# CUSTOM CSS
 # ============================================================
 
 st.markdown(
@@ -62,12 +62,12 @@ st.markdown(
     background:
         radial-gradient(
             circle at 10% 10%,
-            rgba(124,58,237,.22),
+            rgba(124, 58, 237, 0.22),
             transparent 30%
         ),
         radial-gradient(
             circle at 90% 20%,
-            rgba(168,85,247,.18),
+            rgba(168, 85, 247, 0.18),
             transparent 30%
         ),
         #080b16;
@@ -113,12 +113,12 @@ st.markdown(
 
 
 .card {
-    background: rgba(20,24,40,.78);
-    border: 1px solid rgba(192,132,252,.18);
+    background: rgba(20, 24, 40, 0.78);
+    border: 1px solid rgba(192, 132, 252, 0.18);
     border-radius: 22px;
     padding: 24px;
     margin-bottom: 20px;
-    box-shadow: 0 15px 50px rgba(0,0,0,.25);
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.25);
 }
 
 
@@ -126,8 +126,8 @@ st.markdown(
     text-align: center;
     padding: 28px;
     border-radius: 20px;
-    background: rgba(124,58,237,.10);
-    border: 1px solid rgba(192,132,252,.20);
+    background: rgba(124, 58, 237, 0.10);
+    border: 1px solid rgba(192, 132, 252, 0.20);
 }
 
 
@@ -148,19 +148,8 @@ st.markdown(
 }
 
 
-.bot {
-    background: rgba(124,58,237,.15);
-    border-radius: 16px;
-    padding: 12px 16px;
-    margin: 8px 0;
-}
-
-
-.user {
-    background: rgba(255,255,255,.07);
-    border-radius: 16px;
-    padding: 12px 16px;
-    margin: 8px 0;
+.chat-title {
+    margin-top: 35px;
 }
 
 
@@ -168,6 +157,20 @@ st.markdown(
     text-align: center;
     color: #737b91;
     margin-top: 35px;
+    padding-bottom: 20px;
+}
+
+
+/* Streamlit chat bubbles */
+
+[data-testid="stChatMessage"] {
+    border-radius: 18px;
+    margin-bottom: 12px;
+}
+
+
+[data-testid="stChatInput"] {
+    border-radius: 18px;
 }
 
 </style>
@@ -177,7 +180,7 @@ st.markdown(
 
 
 # ============================================================
-# LOAD EMOTION MODEL
+# MODEL
 # ============================================================
 
 @st.cache_resource
@@ -226,33 +229,33 @@ def predict_emotion(image):
 
 
 # ============================================================
-# GROK AI
+# GROQ CLIENT
 # ============================================================
 
 @st.cache_resource
-def get_grok_client():
+def get_groq_client():
 
     try:
 
-        from xai_sdk import Client
+        from groq import Groq
 
-        # First try Streamlit Secrets
-        key = st.secrets.get(
-            "XAI_API_KEY",
+        # Streamlit Secrets
+        api_key = st.secrets.get(
+            "GROQ_API_KEY",
             None
         )
 
-        # If not found, try environment variable
-        if not key:
-            key = os.environ.get(
-                "XAI_API_KEY"
+        # Environment variable fallback
+        if not api_key:
+            api_key = os.environ.get(
+                "GROQ_API_KEY"
             )
 
-        if not key:
+        if not api_key:
             return None
 
-        return Client(
-            api_key=key
+        return Groq(
+            api_key=api_key
         )
 
     except Exception:
@@ -260,148 +263,37 @@ def get_grok_client():
 
 
 # ============================================================
-# ASK GROK
+# GROQ STREAMING RESPONSE
 # ============================================================
 
-def ask_ai(message, emotion):
+def generate_groq_response(
+    client,
+    chat_messages
+):
 
-    client = get_grok_client()
+    stream = client.chat.completions.create(
+        model="llama-3.3-70b-versatile",
 
-    # --------------------------------------------------------
-    # API KEY NOT FOUND
-    # --------------------------------------------------------
+        messages=chat_messages,
 
-    if client is None:
+        temperature=0.7,
 
-        return (
-            "I'm connected to the Emotion AI app, "
-            "but the Grok API key has not been configured yet. "
-            "Please add XAI_API_KEY in Streamlit Secrets."
-        )
+        max_tokens=700,
 
+        stream=True,
+    )
 
-    # --------------------------------------------------------
-    # GROK INSTRUCTIONS
-    # --------------------------------------------------------
+    for chunk in stream:
 
-    system_instruction = """
-You are Emotion AI, a friendly, intelligent and natural
-AI assistant inside a facial emotion recognition application.
+        if not chunk.choices:
+            continue
 
-Your job is to have a normal conversation with the user while
-also understanding the facial emotion detected by the application.
+        delta = chunk.choices[0].delta
 
-IMPORTANT RULES:
+        content = delta.content
 
-1. Answer the user's actual question.
-
-2. Do not give the same generic response repeatedly.
-
-3. If the user asks a normal question, answer the question normally.
-
-4. If the user asks about their detected emotion, explain the
-   detected facial expression clearly.
-
-5. The detected emotion is only an AI prediction based on facial
-   expression. It does NOT prove exactly how the person feels.
-
-6. If the detected emotion is happy, you can respond positively.
-
-7. If the detected emotion is sad, be gentle and supportive.
-
-8. If the detected emotion is angry, respond calmly.
-
-9. If the detected emotion is fearful, be reassuring.
-
-10. If the detected emotion is surprised, respond naturally.
-
-11. If the detected emotion is disgust, respond naturally and politely.
-
-12. If the detected emotion is neutral, explain that the model
-    detected a neutral facial expression.
-
-13. Give practical general advice when appropriate.
-
-14. Keep answers concise enough for a chatbot.
-
-15. Be friendly and conversational.
-
-16. Use emojis occasionally, but do not overuse them.
-
-17. Never diagnose mental-health conditions based on facial emotion.
-
-18. Never claim that facial emotion recognition can know someone's
-    exact internal feelings.
-
-19. If the user says "hi", "hello", "hey", etc., respond naturally
-    instead of talking about their emotion immediately.
-
-20. If the user asks for motivation, encouragement or general advice,
-    provide useful and supportive advice.
-"""
-
-
-    # --------------------------------------------------------
-    # USER MESSAGE + EMOTION CONTEXT
-    # --------------------------------------------------------
-
-    user_prompt = f"""
-Current detected facial emotion:
-{emotion}
-
-Remember:
-This emotion is only a machine-learning prediction of facial
-expression and may not represent the person's actual feelings.
-
-User's message:
-{message}
-"""
-
-
-    # --------------------------------------------------------
-    # CALL GROK
-    # --------------------------------------------------------
-
-    try:
-
-        from xai_sdk.chat import (
-            system,
-            user
-        )
-
-        chat = client.chat.create(
-            model="grok-4.6"
-        )
-
-        chat.append(
-            system(
-                system_instruction
-            )
-        )
-
-        chat.append(
-            user(
-                user_prompt
-            )
-        )
-
-        response = chat.sample()
-
-        reply = response.content
-
-        if reply:
-            return reply
-
-        return (
-            "I couldn't generate a response right now. "
-            "Please try again."
-        )
-
-    except Exception as e:
-
-        return (
-            f"Grok connection error: {e}"
-        )
+        if content:
+            yield content
 
 
 # ============================================================
@@ -439,7 +331,7 @@ st.markdown(
 
 
 # ============================================================
-# MAIN COLUMNS
+# IMAGE + EMOTION SECTION
 # ============================================================
 
 left, right = st.columns(
@@ -449,7 +341,7 @@ left, right = st.columns(
 
 
 # ============================================================
-# LEFT SIDE — IMAGE ANALYSIS
+# LEFT — UPLOAD
 # ============================================================
 
 with left:
@@ -501,22 +393,18 @@ with left:
 
             st.session_state["emotion"] = emotion
 
-            st.session_state["confidence"] = (
-                confidence
-            )
+            st.session_state["confidence"] = confidence
 
-            st.session_state["probabilities"] = (
-                probabilities
-            )
+            st.session_state["probabilities"] = probabilities
 
     st.markdown(
-        '</div>',
+        "</div>",
         unsafe_allow_html=True
     )
 
 
 # ============================================================
-# RIGHT SIDE — EMOTION RESULT
+# RIGHT — EMOTION RESULT
 # ============================================================
 
 with right:
@@ -541,7 +429,10 @@ with right:
     </div>
 
     <div class="emotion-icon">
-        {EMOTION_ICONS.get(emotion, "🤖")}
+        {EMOTION_ICONS.get(
+            emotion,
+            "🤖"
+        )}
     </div>
 
     <div class="emotion-name">
@@ -556,7 +447,6 @@ with right:
 """,
             unsafe_allow_html=True
         )
-
 
         probabilities = st.session_state.get(
             "probabilities"
@@ -607,44 +497,92 @@ with right:
 
 
 # ============================================================
-# CHATBOT
+# CHATBOT HEADER
 # ============================================================
 
 st.markdown(
-    "## 💬 Emotion AI Chatbot"
+    '<h2 class="chat-title">💬 Emotion AI Chatbot</h2>',
+    unsafe_allow_html=True
 )
 
+
+# ============================================================
+# CURRENT EMOTION
+# ============================================================
 
 current_emotion = st.session_state.get(
     "emotion",
     "unknown"
 )
 
+emotion_display = current_emotion.capitalize()
 
-# ============================================================
-# CURRENT EMOTION CARD
-# ============================================================
-
-st.markdown(
-    f"""
-<div class="card">
-
-    <div class="small">
-        Current detected emotion
-    </div>
-
-    <strong>
-        {EMOTION_ICONS.get(
-            current_emotion,
-            "🤖"
-        )}
-        {current_emotion.capitalize()}
-    </strong>
-
-</div>
-""",
-    unsafe_allow_html=True
+st.info(
+    f"{EMOTION_ICONS.get(current_emotion, '🤖')} "
+    f"Current detected emotion: **{emotion_display}**"
 )
+
+
+# ============================================================
+# CHATBOT SYSTEM PROMPT
+# ============================================================
+
+SYSTEM_PROMPT = """
+You are Emotion AI, a friendly, intelligent and natural AI
+assistant inside a Facial Emotion Recognition application.
+
+You are a REAL conversational chatbot.
+
+You should:
+- Have natural conversations with the user.
+- Remember and use the previous messages in the conversation.
+- Answer the user's actual question.
+- Avoid repeating generic answers.
+- Be friendly, helpful and conversational.
+- Give useful explanations and examples.
+- Keep normal answers reasonably concise.
+- Use emojis naturally but don't overuse them.
+
+The application has a facial emotion recognition model.
+
+The detected facial emotion is only an AI prediction based on
+facial expression. It does NOT prove the person's true internal
+feelings.
+
+If the user asks about their detected emotion:
+- Explain the detected expression.
+- Mention that it is only an AI prediction when appropriate.
+
+If the detected emotion is:
+happy:
+    Respond positively and warmly.
+
+sad:
+    Be gentle and supportive.
+
+angry:
+    Respond calmly.
+
+fear:
+    Be reassuring.
+
+surprise:
+    Respond naturally.
+
+disgust:
+    Respond naturally and politely.
+
+neutral:
+    Explain that the model detected a neutral facial expression.
+
+IMPORTANT:
+Never diagnose mental-health conditions based on facial emotion.
+Never claim that facial recognition can know exactly how someone
+feels internally.
+
+If the user asks a completely normal question, answer that
+question normally instead of unnecessarily talking about emotions.
+"""
 
 
 # ============================================================
@@ -654,15 +592,14 @@ st.markdown(
 if "messages" not in st.session_state:
 
     st.session_state.messages = [
-
         {
             "role": "assistant",
-            "content":
-                "Hi! 👋 I'm your Emotion AI assistant. "
-                "Upload an image first, or just start "
-                "chatting with me."
+            "content": (
+                "Hi! 👋 I'm **Emotion AI**. "
+                "Upload a face image to detect an emotion, "
+                "or simply start chatting with me!"
+            )
         }
-
     ]
 
 
@@ -672,42 +609,17 @@ if "messages" not in st.session_state:
 
 for message in st.session_state.messages:
 
-    if message["role"] == "assistant":
-
-        st.markdown(
-            f"""
-<div class="bot">
-
-    🤖 <strong>
-        Emotion AI
-    </strong>
-
-    <br>
-
-    {message["content"]}
-
-</div>
-""",
-            unsafe_allow_html=True
+    with st.chat_message(
+        message["role"],
+        avatar=(
+            "🤖"
+            if message["role"] == "assistant"
+            else "👤"
         )
-
-    else:
+    ):
 
         st.markdown(
-            f"""
-<div class="user">
-
-    👤 <strong>
-        You
-    </strong>
-
-    <br>
-
-    {message["content"]}
-
-</div>
-""",
-            unsafe_allow_html=True
+            message["content"]
         )
 
 
@@ -716,13 +628,16 @@ for message in st.session_state.messages:
 # ============================================================
 
 prompt = st.chat_input(
-    "Type your message..."
+    "Message Emotion AI..."
 )
 
 
 if prompt:
 
-    # Add user message
+    # --------------------------------------------------------
+    # ADD USER MESSAGE
+    # --------------------------------------------------------
+
     st.session_state.messages.append(
         {
             "role": "user",
@@ -731,28 +646,130 @@ if prompt:
     )
 
 
-    # Ask Grok
-    with st.spinner(
-        "Emotion AI is typing..."
+    # --------------------------------------------------------
+    # DISPLAY USER MESSAGE
+    # --------------------------------------------------------
+
+    with st.chat_message(
+        "user",
+        avatar="👤"
     ):
 
-        reply = ask_ai(
-            prompt,
-            current_emotion
+        st.markdown(
+            prompt
         )
 
 
-    # Add Grok response
-    st.session_state.messages.append(
-        {
-            "role": "assistant",
-            "content": reply
-        }
-    )
+    # --------------------------------------------------------
+    # GET GROQ CLIENT
+    # --------------------------------------------------------
+
+    client = get_groq_client()
 
 
-    # Refresh app
-    st.rerun()
+    # --------------------------------------------------------
+    # ASSISTANT RESPONSE
+    # --------------------------------------------------------
+
+    with st.chat_message(
+        "assistant",
+        avatar="🤖"
+    ):
+
+        if client is None:
+
+            reply = (
+                "⚠️ Groq API key is not configured yet. "
+                "Please add `GROQ_API_KEY` in Streamlit Secrets."
+            )
+
+            st.error(reply)
+
+        else:
+
+            # ------------------------------------------------
+            # BUILD CONVERSATION
+            # ------------------------------------------------
+
+            api_messages = [
+                {
+                    "role": "system",
+                    "content": (
+                        SYSTEM_PROMPT
+                        +
+                        f"""
+
+CURRENT DETECTED FACIAL EMOTION:
+{current_emotion}
+
+Remember:
+This detected emotion is only an AI prediction of facial
+expression and does not guarantee the person's actual feelings.
+"""
+                    )
+                }
+            ]
+
+
+            # Add previous conversation
+            for message in st.session_state.messages:
+
+                api_messages.append(
+                    {
+                        "role": message["role"],
+                        "content": message["content"]
+                    }
+                )
+
+
+            # ------------------------------------------------
+            # STREAM GROQ RESPONSE
+            # ------------------------------------------------
+
+            try:
+
+                response_container = st.empty()
+
+                full_response = ""
+
+                for piece in generate_groq_response(
+                    client,
+                    api_messages
+                ):
+
+                    full_response += piece
+
+                    response_container.markdown(
+                        full_response + "▌"
+                    )
+
+                response_container.markdown(
+                    full_response
+                )
+
+
+                # ------------------------------------------------
+                # SAVE ASSISTANT RESPONSE
+                # ------------------------------------------------
+
+                st.session_state.messages.append(
+                    {
+                        "role": "assistant",
+                        "content": full_response
+                    }
+                )
+
+
+            except Exception as e:
+
+                error_message = (
+                    f"Sorry, I couldn't connect to Groq right now.\n\n"
+                    f"Error: `{e}`"
+                )
+
+                st.error(
+                    error_message
+                )
 
 
 # ============================================================
@@ -765,8 +782,8 @@ st.markdown(
 
     Face Emotion Recognition
     • MobileNetV2
-    + Streamlit
-    + Grok AI
+    • Streamlit
+    • Groq AI
 
 </div>
 """,
