@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,7 +14,12 @@
 
     <div class="container">
 
+        <!-- ============================= -->
+        <!-- HEADER -->
+        <!-- ============================= -->
+
         <header>
+
             <div class="logo">
                 <span>◉</span> Emotion AI
             </div>
@@ -22,13 +28,25 @@
                 <span class="dot"></span>
                 API Ready
             </div>
+
         </header>
 
 
+        <!-- ============================= -->
+        <!-- MAIN CONTENT -->
+        <!-- ============================= -->
+
         <main>
 
+            <!-- ============================= -->
+            <!-- HERO SECTION -->
+            <!-- ============================= -->
+
             <section class="hero">
-                <p class="tag">AI POWERED</p>
+
+                <p class="tag">
+                    AI POWERED
+                </p>
 
                 <h1>
                     Face Emotion<br>
@@ -39,18 +57,28 @@
                     Upload a facial image and let our AI model
                     analyze the emotion.
                 </p>
+
             </section>
 
 
+            <!-- ============================= -->
+            <!-- IMAGE UPLOAD CARD -->
+            <!-- ============================= -->
+
             <section class="card">
 
-                <div class="upload-area" id="uploadArea">
+                <div
+                    class="upload-area"
+                    id="uploadArea"
+                >
 
                     <div class="upload-icon">
                         📷
                     </div>
 
-                    <h2>Upload an Image</h2>
+                    <h2>
+                        Upload an Image
+                    </h2>
 
                     <p>
                         Choose a clear face image to analyze
@@ -70,79 +98,378 @@
                 </div>
 
 
-                <div class="preview-container" id="previewContainer">
+                <!-- ============================= -->
+                <!-- IMAGE PREVIEW -->
+                <!-- ============================= -->
 
-                    <img id="previewImage" alt="Preview">
+                <div
+                    class="preview-container"
+                    id="previewContainer"
+                >
 
-                    <button class="remove-btn" id="removeBtn">
+                    <img
+                        id="previewImage"
+                        alt="Selected image preview"
+                    >
+
+                    <button
+                        class="remove-btn"
+                        id="removeBtn"
+                    >
                         ×
                     </button>
 
                 </div>
 
 
-                <button class="analyze-btn" id="analyzeBtn">
+                <!-- ============================= -->
+                <!-- ANALYZE BUTTON -->
+                <!-- ============================= -->
+
+                <button
+                    class="analyze-btn"
+                    id="analyzeBtn"
+                >
                     Analyze Emotion
                 </button>
 
             </section>
 
 
-            <section class="result-card" id="resultCard">
+            <!-- ============================= -->
+            <!-- RESULT CARD -->
+            <!-- ============================= -->
+
+            <section
+                class="result-card"
+                id="resultCard"
+            >
 
                 <div class="result-header">
-                    <span>Analysis Result</span>
-                    <span class="ai-badge">AI</span>
+
+                    <span>
+                        Analysis Result
+                    </span>
+
+                    <span class="ai-badge">
+                        AI
+                    </span>
+
                 </div>
+
+
+                <!-- EMOTION RESULT -->
 
                 <div class="emotion">
 
-                    <div class="emotion-icon" id="emotionIcon">
+                    <div
+                        class="emotion-icon"
+                        id="emotionIcon"
+                    >
                         😊
                     </div>
 
                     <div>
-                        <p class="small-text">Detected Emotion</p>
+
+                        <p class="small-text">
+                            Detected Emotion
+                        </p>
 
                         <h2 id="emotionText">
                             Happy
                         </h2>
+
                     </div>
 
                 </div>
 
 
+                <!-- CONFIDENCE -->
+
                 <div class="confidence">
 
                     <div class="confidence-top">
-                        <span>Confidence</span>
+
+                        <span>
+                            Confidence
+                        </span>
+
                         <strong id="confidenceText">
                             94%
                         </strong>
+
                     </div>
 
+
                     <div class="progress">
+
                         <div
                             class="progress-bar"
-                            id="progressBar">
+                            id="progressBar"
+                        >
                         </div>
+
                     </div>
 
                 </div>
 
             </section>
 
+
         </main>
 
 
+        <!-- ============================= -->
+        <!-- CHATBOT -->
+        <!-- ============================= -->
+
+        <div
+            class="chatbot"
+            id="chatbot"
+        >
+
+
+            <!-- CHATBOT TOGGLE BUTTON -->
+
+            <button
+                class="chatbot-toggle"
+                id="chatbotToggle"
+                aria-label="Open Emotion AI chatbot"
+            >
+
+                <span class="bot-icon">
+                    🤖
+                </span>
+
+            </button>
+
+
+            <!-- ============================= -->
+            <!-- CHATBOT WINDOW -->
+            <!-- ============================= -->
+
+            <div
+                class="chatbot-window"
+                id="chatbotWindow"
+            >
+
+
+                <!-- CHATBOT HEADER -->
+
+                <div class="chatbot-header">
+
+                    <div class="chatbot-profile">
+
+                        <div class="chatbot-avatar">
+                            🤖
+                        </div>
+
+                        <div class="chatbot-info">
+
+                            <strong>
+                                Emotion AI
+                            </strong>
+
+                            <span>
+                                <i></i>
+                                Online
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <button
+                        class="close-chat"
+                        id="closeChat"
+                        aria-label="Close chatbot"
+                    >
+                        ×
+                    </button>
+
+                </div>
+
+
+                <!-- ============================= -->
+                <!-- CHAT MESSAGES -->
+                <!-- ============================= -->
+
+                <div
+                    class="chat-messages"
+                    id="chatMessages"
+                >
+
+
+                    <!-- INITIAL BOT MESSAGE -->
+
+                    <div class="message bot-message">
+
+                        <div class="message-avatar">
+                            🤖
+                        </div>
+
+                        <div class="message-content">
+
+                            <p>
+                                Hi! 👋 I'm your Emotion AI
+                                assistant.
+                            </p>
+
+                            <p>
+                                Analyze your emotion and
+                                let's talk about how you're
+                                feeling. 💙
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- EMOTION CONTEXT MESSAGE -->
+
+                    <div
+                        class="message bot-message emotion-context"
+                        id="emotionContext"
+                        style="display: none;"
+                    >
+
+                        <div class="message-avatar">
+                            🤖
+                        </div>
+
+                        <div class="message-content">
+
+                            <p id="emotionContextText">
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+
+                <!-- ============================= -->
+                <!-- TYPING INDICATOR -->
+                <!-- ============================= -->
+
+                <div
+                    class="typing-indicator"
+                    id="typingIndicator"
+                >
+
+                    <div class="typing-avatar">
+                        🤖
+                    </div>
+
+                    <div class="typing-dots">
+
+                        <span></span>
+                        <span></span>
+                        <span></span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ============================= -->
+                <!-- QUICK ACTIONS -->
+                <!-- ============================= -->
+
+                <div
+                    class="quick-actions"
+                    id="quickActions"
+                >
+
+                    <button
+                        class="quick-btn"
+                        data-message="How am I feeling?"
+                    >
+                        🧠 How am I feeling?
+                    </button>
+
+                    <button
+                        class="quick-btn"
+                        data-message="I want to talk"
+                    >
+                        💬 I want to talk
+                    </button>
+
+                    <button
+                        class="quick-btn"
+                        data-message="Give me some advice"
+                    >
+                        💡 Give me advice
+                    </button>
+
+                </div>
+
+
+                <!-- ============================= -->
+                <!-- CHAT INPUT -->
+                <!-- ============================= -->
+
+                <div class="chat-input-area">
+
+                    <input
+                        type="text"
+                        id="chatInput"
+                        placeholder="Type your message..."
+                        autocomplete="off"
+                    >
+
+                    <button
+                        id="sendMessage"
+                        class="send-message"
+                        aria-label="Send message"
+                    >
+                        ➤
+                    </button>
+
+                </div>
+
+
+                <!-- CHATBOT FOOTER -->
+
+                <div class="chatbot-footer">
+
+                    <span>
+                        Powered by AI
+                    </span>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+
+        <!-- ============================= -->
+        <!-- FOOTER -->
+        <!-- ============================= -->
+
         <footer>
-            Face Emotion Recognition • FastAPI + Deep Learning
+
+            Face Emotion Recognition
+            • FastAPI + Deep Learning
+
         </footer>
+
 
     </div>
 
 
+    <!-- ============================= -->
+    <!-- JAVASCRIPT -->
+    <!-- ============================= -->
+
     <script src="script.js"></script>
 
 </body>
+
 </html>
