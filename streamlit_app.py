@@ -464,6 +464,10 @@ if "messages" not in st.session_state:
         }
     ]
 
+# Changing this number gives Streamlit a fresh empty chat input.
+if "chat_input_id" not in st.session_state:
+    st.session_state.chat_input_id = 0
+
 current_emotion = st.session_state.get("emotion", "unknown")
 
 
@@ -492,7 +496,7 @@ with st.popover("🤖", use_container_width=False):
     prompt = st.text_input(
         "Message",
         placeholder="Type your message...",
-        key="chat_prompt",
+        key=f"chat_prompt_{st.session_state.chat_input_id}",
         label_visibility="collapsed",
     )
 
@@ -519,7 +523,7 @@ with st.popover("🤖", use_container_width=False):
                 "content": "Hi! 👋 I'm **Emotion AI**. How can I help you?",
             }
         ]
-        st.session_state.chat_prompt = ""
+        st.session_state.chat_input_id += 1
         st.rerun()
 
     if send and prompt.strip():
@@ -591,7 +595,7 @@ If the user asks something unrelated to emotion recognition, answer normally.
                     }
                 )
 
-        st.session_state.chat_prompt = ""
+        st.session_state.chat_input_id += 1
         st.rerun()
 
 
