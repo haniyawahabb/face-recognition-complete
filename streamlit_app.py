@@ -278,7 +278,9 @@ def generate_groq_response(
 
         temperature=0.7,
 
-        max_tokens=700,
+        max_completion_tokens=700,
+
+        include_reasoning=False,
 
         stream=True,
     )
@@ -306,77 +308,242 @@ def get_ai_response(client, chat_messages):
         model="openai/gpt-oss-20b",
         messages=chat_messages,
         temperature=0.7,
-        max_tokens=700,
+        max_completion_tokens=700,
+        include_reasoning=False,
         stream=False,
     )
     return response.choices[0].message.content
 
 
 # ============================================================
-# CLEAN UI STYLES
+# POLISHED UI STYLES
 # ============================================================
 
 st.markdown("""
 <style>
-.stApp {
-    background: radial-gradient(circle at 10% 10%, rgba(124,58,237,.20), transparent 30%),
-                radial-gradient(circle at 90% 20%, rgba(168,85,247,.16), transparent 30%),
-                #080b16;
-}
-.block-container { max-width: 1150px; padding-top: 2rem; }
-.hero-title { font-size: 48px; font-weight: 800; line-height: 1.1; margin-bottom: 8px; }
-.gradient-text { color: #c084fc; }
-.hero-subtitle { color: #aeb6ca; font-size: 17px; margin-bottom: 30px; }
-.emotion-card {
-    padding: 32px;
-    border-radius: 22px;
-    text-align: center;
-    background: rgba(20,24,40,.78);
-    border: 1px solid rgba(192,132,252,.20);
-    box-shadow: 0 15px 50px rgba(0,0,0,.25);
-}
-.emotion-icon { font-size: 70px; }
-.emotion-title { font-size: 30px; font-weight: 700; text-transform: capitalize; }
-.emotion-confidence { color: #aeb6ca; font-size: 15px; }
 
-/* Floating chatbot launcher */
+/* ---------- Main page ---------- */
+.stApp {
+    background:
+        radial-gradient(circle at 12% 8%, rgba(124,58,237,.18), transparent 28%),
+        radial-gradient(circle at 88% 18%, rgba(192,132,252,.12), transparent 26%),
+        linear-gradient(180deg, #070a14 0%, #0b1020 55%, #070a14 100%);
+    color: #f8fafc;
+}
+
+.block-container {
+    max-width: 1180px;
+    padding-top: 2.5rem;
+    padding-bottom: 5rem;
+}
+
+.hero-title {
+    font-size: clamp(2.4rem, 5vw, 4rem);
+    font-weight: 850;
+    letter-spacing: -2px;
+    line-height: 1.05;
+    margin-bottom: 10px;
+}
+
+.gradient-text {
+    background: linear-gradient(90deg, #c084fc 0%, #a855f7 45%, #7c3aed 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.hero-subtitle {
+    color: #a8b0c5;
+    font-size: 17px;
+    line-height: 1.6;
+    margin-bottom: 28px;
+}
+
+.emotion-card {
+    padding: 38px 24px;
+    min-height: 250px;
+    border-radius: 26px;
+    text-align: center;
+    background: linear-gradient(145deg, rgba(20,24,40,.92), rgba(14,17,31,.86));
+    border: 1px solid rgba(192,132,252,.22);
+    box-shadow: 0 24px 70px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,255,255,.04);
+}
+
+.emotion-icon { font-size: 74px; margin-bottom: 10px; }
+.emotion-title { font-size: 31px; font-weight: 800; text-transform: capitalize; }
+.emotion-confidence { color: #aeb6ca; font-size: 15px; margin-top: 7px; }
+
+/* ---------- Native buttons ---------- */
+.stButton > button {
+    border-radius: 12px !important;
+    border: 1px solid rgba(168,85,247,.35) !important;
+    background: rgba(124,58,237,.14) !important;
+    color: #f8fafc !important;
+    font-weight: 650 !important;
+    transition: all .2s ease !important;
+}
+
+.stButton > button:hover {
+    border-color: #a855f7 !important;
+    background: linear-gradient(135deg, rgba(124,58,237,.85), rgba(168,85,247,.85)) !important;
+    color: white !important;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 25px rgba(124,58,237,.25) !important;
+}
+
+/* ---------- Floating launcher ---------- */
 [data-testid="stPopover"] > button {
     position: fixed !important;
-    right: 28px !important;
-    bottom: 22px !important;
+    right: 26px !important;
+    bottom: 24px !important;
     z-index: 999999 !important;
-    width: 62px !important;
-    height: 62px !important;
-    min-height: 62px !important;
-    border-radius: 50% !important;
+    width: 66px !important;
+    height: 66px !important;
+    min-height: 66px !important;
     padding: 0 !important;
-    border: 0 !important;
-    background: linear-gradient(135deg,#7c3aed,#a855f7) !important;
-    color: white !important;
-    font-size: 27px !important;
-    box-shadow: 0 12px 35px rgba(124,58,237,.45) !important;
+    border-radius: 50% !important;
+    border: 2px solid rgba(255,255,255,.18) !important;
+    background: linear-gradient(135deg, #6d28d9 0%, #9333ea 48%, #c084fc 100%) !important;
+    color: #fff !important;
+    font-size: 29px !important;
+    box-shadow: 0 0 0 7px rgba(124,58,237,.10), 0 16px 45px rgba(76,29,149,.55) !important;
 }
-[data-testid="stPopover"] > button:hover { transform: scale(1.05); }
+
+[data-testid="stPopover"] > button:hover {
+    transform: scale(1.07) !important;
+    box-shadow: 0 0 0 9px rgba(168,85,247,.12), 0 18px 50px rgba(124,58,237,.65) !important;
+}
+
+/* ---------- Chat window ---------- */
 [data-testid="stPopoverBody"] {
-    width: 390px !important;
-    max-width: calc(100vw - 30px) !important;
-    border-radius: 20px !important;
+    width: 405px !important;
+    max-width: calc(100vw - 24px) !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    border-radius: 24px !important;
+    background: #0d1120 !important;
+    border: 1px solid rgba(192,132,252,.28) !important;
+    box-shadow: 0 30px 90px rgba(0,0,0,.55) !important;
 }
-.chat-head {
-    background: linear-gradient(135deg,#7c3aed,#a855f7);
+
+.chat-shell {
+    background: #0d1120;
+    padding: 0 14px 14px;
+}
+
+.chat-header {
+    margin: 0 -14px 12px;
+    padding: 17px 18px;
+    background: linear-gradient(135deg, #5b21b6 0%, #7c3aed 48%, #a855f7 100%);
+    border-bottom: 1px solid rgba(255,255,255,.10);
+}
+
+.chat-header-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.chat-avatar {
+    width: 43px;
+    height: 43px;
+    border-radius: 14px;
+    display: grid;
+    place-items: center;
+    background: rgba(255,255,255,.16);
+    border: 1px solid rgba(255,255,255,.22);
+    font-size: 23px;
+}
+
+.chat-title { font-size: 17px; font-weight: 800; color: white; }
+.chat-status { font-size: 11px; color: rgba(255,255,255,.82); margin-top: 2px; }
+.chat-status-dot { color: #86efac; }
+
+.chat-context {
+    margin: 0 0 12px;
+    padding: 8px 11px;
+    border-radius: 11px;
+    background: rgba(168,85,247,.09);
+    border: 1px solid rgba(168,85,247,.16);
+    color: #c9cfe0;
+    font-size: 11px;
+}
+
+.chat-scroll {
+    max-height: 390px;
+    overflow-y: auto;
+    padding: 3px 2px 4px;
+}
+
+.chat-row {
+    display: flex;
+    margin: 8px 0;
+}
+
+.chat-row.user { justify-content: flex-end; }
+.chat-row.assistant { justify-content: flex-start; }
+
+.chat-bubble {
+    max-width: 82%;
+    padding: 10px 13px;
+    border-radius: 16px;
+    font-size: 13px;
+    line-height: 1.5;
+    word-break: break-word;
+}
+
+.chat-bubble.user {
+    background: linear-gradient(135deg, #7c3aed, #9333ea);
     color: white;
-    padding: 14px 16px;
-    border-radius: 15px;
-    margin-bottom: 12px;
+    border-bottom-right-radius: 5px;
 }
-.chat-head-title { font-size: 18px; font-weight: 700; }
-.chat-head-status { font-size: 12px; opacity: .9; }
+
+.chat-bubble.assistant {
+    background: #171c2d;
+    color: #e8ebf4;
+    border: 1px solid rgba(255,255,255,.07);
+    border-bottom-left-radius: 5px;
+}
+
+.chat-label {
+    font-size: 10px;
+    color: #8992aa;
+    margin: 0 4px 3px;
+}
+
+/* ---------- Chat input ---------- */
+[data-testid="stPopoverBody"] input {
+    background: #151a2a !important;
+    color: #f8fafc !important;
+    border: 1px solid rgba(168,85,247,.28) !important;
+    border-radius: 13px !important;
+    height: 43px !important;
+}
+
+[data-testid="stPopoverBody"] input:focus {
+    border-color: #a855f7 !important;
+    box-shadow: 0 0 0 2px rgba(168,85,247,.12) !important;
+}
+
+[data-testid="stPopoverBody"] input::placeholder { color: #737d96 !important; }
+
+[data-testid="stPopoverBody"] .stButton > button {
+    min-height: 41px !important;
+}
+
 @media (max-width: 600px) {
     [data-testid="stPopover"] > button {
-        right: 15px !important;
-        bottom: 15px !important;
+        right: 14px !important;
+        bottom: 14px !important;
+        width: 60px !important;
+        height: 60px !important;
+        min-height: 60px !important;
+    }
+    [data-testid="stPopoverBody"] {
+        width: calc(100vw - 20px) !important;
     }
 }
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -475,52 +642,67 @@ current_emotion = st.session_state.get("emotion", "unknown")
 # FLOATING WEBSITE-STYLE CHATBOT
 # ============================================================
 
+import html
+
 with st.popover("🤖", use_container_width=False):
 
+    st.markdown('<div class="chat-shell">', unsafe_allow_html=True)
+
     st.markdown(
-        '<div class="chat-head"><div class="chat-head-title">🤖 Emotion AI</div><div class="chat-head-status">● Online • AI Assistant</div></div>',
+        """
+        <div class="chat-header">
+            <div class="chat-header-row">
+                <div class="chat-avatar">🤖</div>
+                <div>
+                    <div class="chat-title">Emotion AI</div>
+                    <div class="chat-status"><span class="chat-status-dot">●</span> Online · AI Assistant</div>
+                </div>
+            </div>
+        </div>
+        """,
         unsafe_allow_html=True,
     )
 
-    st.caption(
-        f"Detected emotion: {EMOTION_ICONS.get(current_emotion, '🤖')} {current_emotion.capitalize()}"
+    emotion_label = current_emotion.capitalize() if current_emotion != "unknown" else "Not detected"
+    emotion_icon = EMOTION_ICONS.get(current_emotion, "🤖")
+    st.markdown(
+        f'<div class="chat-context">🧠 Current expression: <b>{html.escape(emotion_label)}</b> {emotion_icon}</div>',
+        unsafe_allow_html=True,
     )
 
+    st.markdown('<div class="chat-scroll">', unsafe_allow_html=True)
     for message in st.session_state.messages:
-        with st.chat_message(
-            message["role"],
-            avatar="🤖" if message["role"] == "assistant" else "👤",
-        ):
-            st.markdown(message["content"])
+        role = message["role"]
+        safe_text = html.escape(message["content"]).replace("\n", "<br>")
+        label = "You" if role == "user" else "Emotion AI"
+        st.markdown(
+            f'<div class="chat-label">{label}</div><div class="chat-row {role}"><div class="chat-bubble {role}">{safe_text}</div></div>',
+            unsafe_allow_html=True,
+        )
+    st.markdown('</div>', unsafe_allow_html=True)
 
     prompt = st.text_input(
         "Message",
-        placeholder="Type your message...",
+        placeholder="Ask me anything...",
         key=f"chat_prompt_{st.session_state.chat_input_id}",
         label_visibility="collapsed",
     )
 
-    send_col, clear_col = st.columns([4, 1])
+    send_col, clear_col = st.columns([5, 1])
 
     with send_col:
-        send = st.button(
-            "➤ Send",
-            use_container_width=True,
-            key="send_chat",
-        )
+        send = st.button("Send  ➤", use_container_width=True, key="send_chat")
 
     with clear_col:
-        clear = st.button(
-            "🗑️",
-            use_container_width=True,
-            key="clear_chat",
-        )
+        clear = st.button("⌫", use_container_width=True, key="clear_chat")
+
+    st.markdown('</div>', unsafe_allow_html=True)
 
     if clear:
         st.session_state.messages = [
             {
                 "role": "assistant",
-                "content": "Hi! 👋 I'm **Emotion AI**. How can I help you?",
+                "content": "Hi! 👋 I'm Emotion AI. How can I help you?",
             }
         ]
         st.session_state.chat_input_id += 1
@@ -543,10 +725,7 @@ with st.popover("🤖", use_container_width=False):
             st.session_state.messages.append(
                 {
                     "role": "assistant",
-                    "content": (
-                        "⚠️ **Groq API key is not configured.**\n\n"
-                        "Add `GROQ_API_KEY` in Streamlit Secrets."
-                    ),
+                    "content": "⚠️ Groq API key is not configured. Add GROQ_API_KEY in Streamlit Secrets.",
                 }
             )
         else:
@@ -555,13 +734,9 @@ You are Emotion AI, a friendly and intelligent AI assistant inside a Facial Emot
 
 Current detected facial emotion: {current_emotion}
 
-Have a natural conversation like a normal website AI chatbot.
-Answer the user's actual question, remember previous messages,
-and be clear, friendly and helpful.
+Have a natural conversation like a modern website AI chatbot. Answer the user's actual question, remember previous messages, and be clear, friendly and helpful.
 
-If asked about the detected emotion, explain that it is only an AI
-prediction based on facial expression and does not prove the person's
-actual feelings. Never diagnose mental-health conditions from facial emotion.
+If asked about the detected emotion, explain that it is only an AI prediction based on facial expression and does not prove the person's actual feelings. Never diagnose mental-health conditions from facial emotion.
 
 If the user asks something unrelated to emotion recognition, answer normally.
 """
@@ -571,7 +746,7 @@ If the user asks something unrelated to emotion recognition, answer normally.
             ] + st.session_state.messages
 
             try:
-                with st.spinner("🤖 Typing..."):
+                with st.spinner("🤖 Thinking..."):
                     reply = get_ai_response(client, api_messages)
 
                 if not reply:
@@ -588,10 +763,7 @@ If the user asks something unrelated to emotion recognition, answer normally.
                 st.session_state.messages.append(
                     {
                         "role": "assistant",
-                        "content": (
-                            "Sorry 😔, I couldn't connect to the AI service.\n\n"
-                            f"`{error}`"
-                        ),
+                        "content": f"Sorry 😔, I couldn't connect to the AI service.\n\n`{error}`",
                     }
                 )
 
