@@ -161,17 +161,219 @@ st.markdown(
 }
 
 
-/* Streamlit chat bubbles */
+/* =========================================================
+   CHATBOT — CLEAN PURPLE / DARK THEME
+   ========================================================= */
 
+/* Floating launcher */
+[data-testid="stPopover"] > button {
+    position: fixed !important;
+    right: 28px !important;
+    bottom: 24px !important;
+    z-index: 999999 !important;
+
+    width: 64px !important;
+    height: 64px !important;
+    min-width: 64px !important;
+    padding: 0 !important;
+
+    border-radius: 50% !important;
+    border: 2px solid rgba(216,180,254,.65) !important;
+
+    background: linear-gradient(135deg, #7c3aed 0%, #a855f7 55%, #c084fc 100%) !important;
+    color: white !important;
+
+    box-shadow:
+        0 0 0 6px rgba(124,58,237,.12),
+        0 12px 35px rgba(0,0,0,.45),
+        0 0 28px rgba(168,85,247,.45) !important;
+
+    font-size: 28px !important;
+    transition: transform .2s ease, box-shadow .2s ease !important;
+}
+
+[data-testid="stPopover"] > button:hover {
+    transform: scale(1.06) !important;
+    box-shadow:
+        0 0 0 7px rgba(124,58,237,.16),
+        0 14px 40px rgba(0,0,0,.5),
+        0 0 34px rgba(168,85,247,.6) !important;
+}
+
+/* Popover window */
+div[role="dialog"] {
+    background: #0b0d1b !important;
+    border: 1px solid rgba(168,85,247,.55) !important;
+    border-radius: 20px !important;
+    box-shadow:
+        0 25px 70px rgba(0,0,0,.60),
+        0 0 35px rgba(124,58,237,.18) !important;
+    overflow: hidden !important;
+}
+
+/* Give the popup a comfortable width */
+div[role="dialog"] > div {
+    background: #0b0d1b !important;
+}
+
+/* Header */
+.chat-header {
+    margin: -1rem -1rem 12px -1rem;
+    padding: 17px 18px;
+    background: linear-gradient(135deg, #5b21b6, #7c3aed 50%, #a855f7);
+    border-bottom: 1px solid rgba(255,255,255,.15);
+}
+
+.chat-header-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.chat-avatar {
+    width: 43px;
+    height: 43px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 13px;
+    background: rgba(255,255,255,.16);
+    border: 1px solid rgba(255,255,255,.25);
+    font-size: 23px;
+}
+
+.chat-title {
+    margin: 0 !important;
+    color: #ffffff !important;
+    font-size: 17px !important;
+    font-weight: 800 !important;
+}
+
+.chat-status {
+    color: rgba(255,255,255,.82) !important;
+    font-size: 11px !important;
+    margin-top: 2px;
+}
+
+.chat-status-dot {
+    color: #86efac !important;
+}
+
+/* Emotion context pill */
+.chat-context {
+    background: #15122a !important;
+    color: #e9d5ff !important;
+    border: 1px solid rgba(168,85,247,.35) !important;
+    border-radius: 10px !important;
+    padding: 8px 10px !important;
+    font-size: 11px !important;
+    margin: 4px 0 10px !important;
+}
+
+.chat-context b {
+    color: #d8b4fe !important;
+}
+
+/* Chat scroll area */
+[data-testid="stVerticalBlockBorderWrapper"] {
+    background: #090b16 !important;
+    border: 1px solid rgba(168,85,247,.18) !important;
+    border-radius: 14px !important;
+}
+
+/* Individual chat messages */
 [data-testid="stChatMessage"] {
-    border-radius: 18px;
-    margin-bottom: 12px;
+    border-radius: 14px !important;
+    margin: 5px 6px !important;
+    padding: 8px 9px !important;
+    color: #f8f7ff !important;
 }
 
-
-[data-testid="stChatInput"] {
-    border-radius: 18px;
+[data-testid="stChatMessage"] p,
+[data-testid="stChatMessage"] li,
+[data-testid="stChatMessage"] span {
+    color: #f3f0ff !important;
+    font-size: 13px !important;
+    line-height: 1.5 !important;
 }
+
+/* Assistant bubble */
+[data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarAssistant"]) {
+    background: #17152a !important;
+    border: 1px solid rgba(168,85,247,.16) !important;
+}
+
+/* User bubble */
+[data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) {
+    background: linear-gradient(135deg, #6d28d9, #9333ea) !important;
+    border: 1px solid rgba(216,180,254,.30) !important;
+}
+
+/* Fallback: Streamlit avatars can vary between versions */
+[data-testid="stChatMessageAvatarUser"] {
+    background: #7c3aed !important;
+}
+
+[data-testid="stChatMessageAvatarAssistant"] {
+    background: #2a2142 !important;
+}
+
+/* Input */
+div[data-testid="stTextInput"] input {
+    background: #111326 !important;
+    color: #ffffff !important;
+    border: 1px solid #6d28d9 !important;
+    border-radius: 12px !important;
+    height: 43px !important;
+    padding: 0 13px !important;
+    box-shadow: inset 0 0 0 1px rgba(168,85,247,.08) !important;
+}
+
+div[data-testid="stTextInput"] input:focus {
+    border-color: #a855f7 !important;
+    box-shadow: 0 0 0 2px rgba(168,85,247,.18) !important;
+}
+
+div[data-testid="stTextInput"] input::placeholder {
+    color: #8f8aa8 !important;
+}
+
+/* Send button */
+div[data-testid="stFormSubmitButton"] button {
+    height: 43px !important;
+    border-radius: 12px !important;
+    border: 0 !important;
+    background: linear-gradient(135deg, #7c3aed, #a855f7) !important;
+    color: #ffffff !important;
+    font-size: 19px !important;
+    font-weight: 800 !important;
+    box-shadow: 0 7px 18px rgba(124,58,237,.28) !important;
+}
+
+div[data-testid="stFormSubmitButton"] button:hover {
+    background: linear-gradient(135deg, #6d28d9, #9333ea) !important;
+}
+
+/* Clear button */
+div[data-testid="stButton"] button {
+    border-radius: 10px !important;
+    background: #151326 !important;
+    color: #c4b5fd !important;
+    border: 1px solid rgba(168,85,247,.24) !important;
+}
+
+/* Spinner */
+[data-testid="stSpinner"] {
+    color: #c084fc !important;
+}
+
+/* Streamlit popover's internal text should stay light */
+div[role="dialog"] p,
+div[role="dialog"] label {
+    color: #e9e4f5 !important;
+}
+
+/* ========================================================= */
 
 </style>
 """,
