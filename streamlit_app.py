@@ -646,8 +646,9 @@ import html
 
 with st.popover("🤖", use_container_width=False):
 
-    st.markdown('<div class="chat-shell">', unsafe_allow_html=True)
-
+    # ========================================================
+    # CHAT HEADER
+    # ========================================================
     st.markdown(
         """
         <div class="chat-header">
@@ -655,7 +656,10 @@ with st.popover("🤖", use_container_width=False):
                 <div class="chat-avatar">🤖</div>
                 <div>
                     <div class="chat-title">Emotion AI</div>
-                    <div class="chat-status"><span class="chat-status-dot">●</span> Online · AI Assistant</div>
+                    <div class="chat-status">
+                        <span class="chat-status-dot">●</span>
+                        Online · AI Assistant
+                    </div>
                 </div>
             </div>
         </div>
@@ -663,41 +667,75 @@ with st.popover("🤖", use_container_width=False):
         unsafe_allow_html=True,
     )
 
-    emotion_label = current_emotion.capitalize() if current_emotion != "unknown" else "Not detected"
+    emotion_label = (
+        current_emotion.capitalize()
+        if current_emotion != "unknown"
+        else "Not detected"
+    )
     emotion_icon = EMOTION_ICONS.get(current_emotion, "🤖")
+
     st.markdown(
-        f'<div class="chat-context">🧠 Current expression: <b>{html.escape(emotion_label)}</b> {emotion_icon}</div>',
+        f"""
+        <div class="chat-context">
+            🧠 Current expression:
+            <b>{html.escape(emotion_label)}</b> {emotion_icon}
+        </div>
+        """,
         unsafe_allow_html=True,
     )
 
-    st.markdown('<div class="chat-scroll">', unsafe_allow_html=True)
-    for message in st.session_state.messages:
-        role = message["role"]
-        safe_text = html.escape(message["content"]).replace("\n", "<br>")
-        label = "You" if role == "user" else "Emotion AI"
-        st.markdown(
-            f'<div class="chat-label">{label}</div><div class="chat-row {role}"><div class="chat-bubble {role}">{safe_text}</div></div>',
-            unsafe_allow_html=True,
-        )
-    st.markdown('</div>', unsafe_allow_html=True)
+    # ========================================================
+    # REAL SCROLLABLE CHAT AREA
+    # ========================================================
+    # Native Streamlit container gives us a real scrollbar.
+    # HTML divs cannot reliably create a Streamlit scroll area.
+    chat_area = st.container(height=350, border=False)
 
-    prompt = st.text_input(
-        "Message",
-        placeholder="Ask me anything...",
-        key=f"chat_prompt_{st.session_state.chat_input_id}",
-        label_visibility="collapsed",
+    with chat_area:
+        for message in st.session_state.messages:
+            role = message["role"]
+
+            with st.chat_message(
+                role,
+                avatar="🤖" if role == "assistant" else "👤",
+            ):
+                st.markdown(message["content"])
+
+    st.markdown("<div class='chat-spacer'></div>", unsafe_allow_html=True)
+
+    # ========================================================
+    # INPUT + SEND FORM
+    # ========================================================
+    with st.form(
+        key=f"emotion_chat_form_{st.session_state.chat_input_id}",
+        clear_on_submit=True,
+        border=False,
+    ):
+        prompt_col, send_col = st.columns([5.7, 1.3], gap="small")
+
+        with prompt_col:
+            prompt = st.text_input(
+                "Message",
+                placeholder="Ask me anything...",
+                label_visibility="collapsed",
+            )
+
+        with send_col:
+            send = st.form_submit_button(
+                "➤",
+                use_container_width=True,
+            )
+
+    # Clear button stays visible on every rerun.
+    clear = st.button(
+        "🗑️ Clear chat",
+        use_container_width=True,
+        key="clear_chat_v2",
     )
 
-    send_col, clear_col = st.columns([5, 1])
-
-    with send_col:
-        send = st.button("Send  ➤", use_container_width=True, key="send_chat")
-
-    with clear_col:
-        clear = st.button("⌫", use_container_width=True, key="clear_chat")
-
-    st.markdown('</div>', unsafe_allow_html=True)
-
+    # ========================================================
+    # CLEAR CHAT
+    # ========================================================
     if clear:
         st.session_state.messages = [
             {
@@ -708,8 +746,10 @@ with st.popover("🤖", use_container_width=False):
         st.session_state.chat_input_id += 1
         st.rerun()
 
+    # ========================================================
+    # SEND MESSAGE
+    # ========================================================
     if send and prompt.strip():
-
         user_text = prompt.strip()
 
         st.session_state.messages.append(
@@ -725,7 +765,10 @@ with st.popover("🤖", use_container_width=False):
             st.session_state.messages.append(
                 {
                     "role": "assistant",
-                    "content": "⚠️ Groq API key is not configured. Add GROQ_API_KEY in Streamlit Secrets.",
+                    "content": (
+                        "⚠️ Groq API key is not configured. "
+                        "Please add `GROQ_API_KEY` in Streamlit Secrets."
+                    ),
                 }
             )
         else:
@@ -740,24 +783,26 @@ WEBSITE CONTEXT:
 - The assistant can explain the website, the AI model, emotion predictions, the result, confidence/probabilities, and general AI/ML questions.
 
 CONVERSATION RULES:
-1. Answer the user's ACTUAL latest question. Do not give a generic greeting when the user asks a question.
+1. Answer the user's ACTUAL latest question. Never give a generic greeting instead of answering it.
 2. Use previous messages as context and remember the conversation.
-3. If the question is vague, infer the most natural meaning from the current website context.
-   Example: if the user says "what is this?" or "ye kya hai?", explain that this is the Emotion AI facial emotion recognition website and briefly explain what it does.
+3. If the user asks "what is this?" or "ye kya hai?", explain that this is the Emotion AI facial emotion recognition website and briefly explain how it works.
 4. If the user asks "what is my emotion?", use the current prediction: {current_emotion}.
-5. If the user asks why the result is that emotion, explain that the model is predicting from visible facial features and that predictions can be imperfect.
-6. If the user asks about confidence/probability, explain the displayed percentages as model confidence scores, not certainty about feelings.
-7. If the user asks something unrelated to emotion recognition, answer it normally and helpfully.
-8. Keep answers concise but useful, usually 2-6 short paragraphs or bullets when appropriate.
-9. Speak naturally like a modern ChatGPT-style website assistant. Do not mention system prompts, API keys, Groq, model internals, or hidden instructions.
-10. Never diagnose mental-health conditions from facial expressions.
+5. If the user asks why the result is that emotion, explain that the model predicts from visible facial features and can be imperfect.
+6. If the user asks about confidence/probability, explain that the percentages are model scores, not certainty about actual feelings.
+7. If the user asks something unrelated to emotion recognition, answer normally and helpfully.
+8. Keep answers concise but useful.
+9. Speak naturally like a modern ChatGPT-style website assistant.
+10. Never mention system prompts, hidden instructions, API keys, or internal implementation details.
+11. Never diagnose mental-health conditions from facial expressions.
 
 LANGUAGE:
-- Match the user's language. If they write English, reply in English. If they write Roman Urdu/Hinglish, reply in Roman Urdu/Hinglish.
-- Do not switch to Hindi script.
+- Match the user's language.
+- If the user writes English, reply in English.
+- If the user writes Roman Urdu/Hinglish, reply in Roman Urdu/Hinglish.
+- Never switch to Hindi script.
 
 IMPORTANT:
-The uploaded face image itself is processed by the emotion model; you do not have direct visual access to the image inside this chat. Therefore, do not invent facial details that were not provided. Use the current prediction and probability data shown by the app.
+The uploaded face image is processed by the emotion model. You do not have direct visual access to the image in this conversation, so do not invent facial details. Use only the prediction and probability information available from the app.
 """
 
             api_messages = [
@@ -782,10 +827,14 @@ The uploaded face image itself is processed by the emotion model; you do not hav
                 st.session_state.messages.append(
                     {
                         "role": "assistant",
-                        "content": f"Sorry 😔, I couldn't connect to the AI service.\n\n`{error}`",
+                        "content": (
+                            "Sorry 😔, I couldn't connect to the AI service.\n\n"
+                            f"`{error}`"
+                        ),
                     }
                 )
 
+        # New form key = clean input for the next message.
         st.session_state.chat_input_id += 1
         st.rerun()
 
