@@ -272,7 +272,7 @@ def generate_groq_response(
 ):
 
     stream = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
+        model="openai/gpt-oss-20b",
 
         messages=chat_messages,
 
@@ -303,7 +303,7 @@ def generate_groq_response(
 
 def get_ai_response(client, chat_messages):
     response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
+        model="openai/gpt-oss-20b",
         messages=chat_messages,
         temperature=0.7,
         max_tokens=700,
